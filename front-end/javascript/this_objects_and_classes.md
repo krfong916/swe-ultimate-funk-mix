@@ -1,26 +1,179 @@
 # This, objects, and es6 classes
 
 ### Summary
-In this document, we will cover the `this` keyword, object prototypes, uses of `.call()` and `.apply()`, lexical `this`, arrow functions, es6 classes, object behavior delegation, some class theory, and objects-linking-other-objects.
+In this document, we will cover the `this` keyword, object prototypes, uses of `.call()` and `.apply()`, lexical `this`, arrow functions, es6 classes, object behavior delegation, some class theory, and objects-linking-other-objects. Our motivation is to learn these concepts is that we must know the finer points of object creation, assignment of values, and behavior delegation in order to better understand Javascript.
 
-### Motivation
-We must know the finer points of object creation, assignment of values, and behavior delegation in order to understand Javascript.
-
-## This
-#### Overview
+### This
 The `this` keyword is a special mechanism in Javascript - it allows us to implicitly pass reference values to other objects.
+It is a source of frustration for many developer's, but it's not as complicated as they make it out to be. In this section, we'll cover the `this` keyword, how it functions, why it's useful, and how it can help us write more expressive code. <br>
+&nbsp;&nbsp;&nbsp;&nbsp; `this` has nothing to do with *where* a function is declared, but everything to do with *how* a function is called. When a function is invoked, an activation record (aka execution context) is created. The activation record contains information about where the function is called from, this is known as the call-stack. To summarize, `this` is a binding that's made when a function is invoked. What it references is determined entirely by the call-site where the function is called
 
-It is a source of frustration for many developer's, but it's not as complicated as they make it out to be. In this section, we'll cover the `this` keyword, how it functions, why it's useful, and how it can help us write more expressive code.
+### TL;DR
+### This is in the global context
+In the global execution context, the `this` keyword refers to the global object.
+- In the browser, it is the global window object, if not using strict mode. If strict mode is enabled, `this` is undefined
+- In node.js, `this` refers to module.exports because the node engine runs each module inside a wrapper function and the wrapper function is invoked witth the `this` value set to module.exports
 
-#### What is this
-`this` has nothing to do with where a function is declared, but everything to do with the manner in which the function is called.
+### This in function calls
+The `this` value is a binding amde when a function is invoked. What that value exactly is is determined by the call-site. In order to avoid polluting the global object with identifiers, use the `new` keyword to create an instance of a constructor. This will prevent properties being added to the global object
 
-When a function is invoked, an activation record (aka execution context) is created. This contains in4mation abt. where the fcn. is called from (call-stack)
+### This in constructor calls
+An object with a `new` operator in front becomes a constructor and a new object is created automatically. The contructor call is used as the `this` binding for the function call.
+<br/>
+For example:
+```javascript
+function person(firstName, lastName) {
+  this.firstName = firstName;
+  this.lastName = lastName;
+  // implicitly return this;
+}
+var somePerson = new Person('zendaya', 'cozz');
+```
+Note: `this` is implicitly returned in a constructor
 
-`this` is a binding that's made when a function is invoked. What it references is determined entirely by the call-site where the function is called
+### This in method calls
+When a function is called as a method of an object, the `this` value is set to the object of the method. <br/>
+For instance:
+```javascript
+const Person = {
+  firstName: 'Kyle',
+  sayHi() {
+    console.log(`Hi, my name is ${this.firstName}`)
+  }
+}
+```
+Confusion occurs when the `this` value is lost i.e. when a method loses its receiver <br/>
+For example:
+```javascript
+const Person = {
+  first: 'Kyle',
+  sayHi: function() {
+    console.log(`${this.first}`)
+  }
+}
 
-#### Quick example:
+const greet = Person.sayHi();
+greet() // greet is not a function
+```
+Explanation: <br/>
+&nbsp;&nbsp;&nbsp;&nbsp; We are calling `greet()` as a regular, plain function call. `first` is `undefined` because `this` refers to the global object. In order to observe the behavior we expect from `greet()`, we must explicitly `this` to a specific object. <br/>
+Observe:
+```javascript
+const Person = {
+  first: 'Kyle',
+  sayHi: function() {
+    console.log(`${this.first}`)
+  }
+}
+Person.sayHi.apply(Person);
+```
+Another confusion developers experience of `this` is when the receiver is lost when we pass a method as a callback to another function. <br/>
+To demonstrate: `setTimeout(Person.sayHi, 1000)`. In order to solve this problem and observe the expected behavior, we can use the `bind()` method: `setTimeout(Person.sayHi.bind(Person), 1000) will log first`
 
+### Specify this using call(), apply(), or bind()
+What's the use of `call()` and `apply()`? A function's `this` is implicitly set, depending on how the function is called. `call()` and `apply()` explicitly bind `this` to the function (or constructor, method, etc.).
+- `apply()`: allows us to invoke a function with arguments
+- `call()`: is for an array, it requires parameters to be lsited explicitly
+
+### Hard-binding a function's this value using bind()
+`bind()` hard binds the object's `this` to a specific target object, permanently.
+- When we try to pass a method as a callback to another function, we often lose the receiver of the method. `setTimeout(Person.sayHi, 1000)` calls the callback set to the global object.
+- Explicitly hard-binding the `this` value to the `person` object, results in binding the `this` to a target object. `setTimeout(Person.sayHi.bind(Person), 1000)`
+- If we extract our explicitly bound function to a variable and invoke that variable as a function, the `this` value is still tied to `Person`.
+```javascript
+var greet = Person.sayHi.bind(Person);
+greet();
+```
+Even if we used `call()` or `apply()`, the object's `this` reference to the target object is maintained from the hard-binding of `bind()`.
+
+### Bind in depth
+```javascript
+/**
+ * @params {thisArg} - the args we want to bind to
+ * @params {fixedArgs} - the fixed number of arguments when we bind the function
+ * note: the snippet - return func.apply(thisArg, [...fixedArgs, ..args])
+ * when the new function is invoked, the argument lists are combined. We are using partial application
+ * here. We provide all fixedArgs and concatenate all dynamic args
+ */
+Function.prototype.bind = function(thisArgs, ...fixedArgs) {
+  const func = this; // we store a reference to the original function in the function variable
+  // spreading (...args) takes care of any arguments that the caller of our inner function might provide
+  return function(...args) { // we return a new function
+    return func.apply(thisArg, [...fixedArgs, ...args]); // we use apply() to invoke our original function
+  }
+}
+```
+Bind returns a new function that we can use to invoke our original function with any of the arguments we want to bind to. We can use `bind()` like so:
+```javascript
+const functionReference = object.someMethod.bind(object); // pass as many args as we want
+functionReference(); // bind returns a function, we can invoke that function
+```
+### Arrow functions
+- Arrow functions use the `this` from its enclosing execution context
+- If we try to pass a `this` arg to a function using `call()`, `apply()`, or `bind()`, it will be ignored i.e. the arrow function's thisArg always uses the `this` value captured when the function was created
+- Arrow functions can't be used as constructors
+- the benefit of using an arrow function is seen when we want to access `this` within a callback
+
+Consider the following counter method:
+```javascript
+const counter = {
+  count: 0,
+  incrementPeriodically() {
+    setInterval(function() {
+      console.log(++this.count)
+    }, 1000);
+  }
+}
+counter.incrementPeriodically();
+```
+The `this` binding withi our function expression refers to the global object instead of our counter object because that's how `setInterval()` works. Let's convert our function expression to an arrow function
+```javascript
+const counter = {
+  count: 0,
+  incrementPeriodically: function() {
+    setInterval(() => {
+      console.log(++this.count)
+    }, 1000)
+  }
+}
+counter.incrementPeriodically();
+```
+Now our callback uses the `this` binding from the `incrementPeriodically()` method. Since we invoked `incrementPeriodically()` using the method syntax, `this` is set to `counter` and everything works out.
+### This in class bodies
+We will demonstrate how to properly bind `this` value to class bodies so the invocation will result in expected behavior. <br/>
+Don't do the following:
+```javascript
+class Person() {
+  constructor(firstName, lastName) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+  }
+  sayHi() {
+    console.log(`Hi my name is ${this.firstName}`)
+  }
+}
+const person = new Person('Kyle', 'Fong');
+const greet = person.sayHi;
+greet(); // cannot read property 'firstName' of undefined
+```
+We get an error because we are invoking `sayHi()` as a function, `greet()`, and we lose the receiver of the method. *Also*, the class body has an implicit `use strict` mode. To observe the expected behavior, we can use an explicit `bind()` method in the constructor of the class to tie the `sayHi()` function to `person`.
+```javascript
+class Person {
+  constructor(firstName, lastName) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.sayHi = this.sayHi.bind(this);
+  }
+  sayHi() {/*...*/}
+  // Alternatively, we can use class fields and arrow functions
+  // to implicitly bind this to the instance of the class
+  // sayHi = () => {/*...*/}
+  // and remove the explicit binding from the constructor
+}
+```
+### End of TL;DR
+
+In the following example, we will observe the how `this` can be used to create behavior across multiple contexts:
 ```javascript
 function identify() {
   return this.name.toUpperCase();
@@ -43,27 +196,24 @@ identify.call(you); // READER
 speak.call(me); // Hello, I'm KYLE
 speak.call(you); // Hello, I'm READER
 ```
+**Explanation:** The code snippet allows `identify()` and `speak()` to be re-used against multiple contexts, the me and you objects, rather than needing a separate version of the function for each object. The next example demonstrates explicitly passing context:
+```javascript
+function identify ( context ) {
+  return context.name.toUpperCase();
+}
+function speak ( context ) {
+  var greeting = "Hello, I'm " + identify(context);
+  console.log(greeting);
+}
 
-**Explanation:** The code snippet allows `identify()` and `speak()` to be re-used against multiple contexts (me & you) objects, rather than needing a separate version of the function for each object
-
-Alternatively, we could have explicitly passed the context
-
-    function identify ( context ) {
-      return context.name.toUpperCase();
-    }
-    function speak ( context ) {
-      var greeting = "Hello, I'm " + identify(context);
-      console.log(greeting);
-    }
-
-    identify(you); // READER
-    speak(me); // Hello, I'm KYLE
-
+identify(you); // READER
+speak(me); // Hello, I'm KYLE
+```
 #### Explicitly passing context is messier
-using the `this` mechanism is:
+Instead, we should use the `this` mechanism for the following reasons: it's
 - much cleaner
-- more elegant way of implicitly 'passing along' an object reference
-- much cleaner API design
+- a more elegant way of implicitly 'passing along' an object reference
+- can lead to a cleaner API design
 
 
 The `this` keyword is **NOT** to be confused with any reference to lexical scoping or bridging values via lexical scope.
@@ -84,15 +234,15 @@ There are 4 ways to determine the call-site of the `this` keyword. Finding the a
 
 #### Default binding
 Consider:
+```javascript
+function foo() {
+  console.log(this.a)
+}
 
-    function foo() {
-      console.log(this.a)
-    }
+var a = 2
 
-    var a = 2
-
-    foo(); // access 'a', property on the global object
-
+foo(); // access 'a', property on the global object
+```
 **Explanation:** when foo() is called, `this.a` resolves to our global variable `a`. The default binding for `this` applies to the function call, so `this` points at the global object
 
 #### Implicit binding, implicity lost
@@ -163,7 +313,7 @@ var a = "oops global"
 
 setTimeout(obj.foo, 100)
 ```
-Equivalent to
+Is equivalent to:
 ```javascript
 function setTimeout(fn, delay) {
   // wait(), somehow for 100 seconds
