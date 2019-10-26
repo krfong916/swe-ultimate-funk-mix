@@ -157,3 +157,24 @@ the business logic are the flows and rules that only make sense in the context o
 ## Dependency Inversion Principle
 ## Application Service
 
+Notes:
+- Should repository layer return data transfer object?
+    + no, repository is responsible for turning persisted data back to entities (models) and vice versa
+    + model is a business model representing a business entity. DTO on the other hand, *while it looks like a model*, is concerned with transfer of the object between various environments and is a transient object. Usually mappers are responsible for turning the model into a data transfer object
+    + what about the specialized transfer objects for between the service and data layer for more complex queries to avoid having to do multiple queries?
+    + source: https://stackoverflow.com/questions/5068984/should-the-repository-layer-return-data-transfer-objects-dto?rq=1
+- What is the difference between data access object and repository pattern?
+    + DAO is an abstraction of data persistence
+    + Repository is an abstraction of collection of objects
+    + DAO is considered closer to the db, often table-centric
+    + Repository would be considered closer to the Domain dealing only in aggregate roots
+        * aggregate roots are domain concepts (order, playlist, clinic visit, report) and not collection classes (lists, maps, etc.) in generics. consistency boundaries for transactions/concurrency and deemphasize that outside entities cannot hold references to other aggregate's child entities 
+        * an example is a model containing a customer entity and an address entity. We would never access an address entity directly from the model because it doesn't make sense without the context of the associated customer. So customer and address combined form and aggregate and the aggregate root is customer
+        * aggregate roots are consistency boundaries for transactions/concurrency
+        * aggregate root encapsulates multiple classes and we can manipualte the whole heirarchy through the main object
+        * source: https://stackoverflow.com/questions/1958621/whats-an-aggregate-root
+    + The repository is a narrow interface, simply a collection of objects with get(id), findBy(), add(entity)
+    + The repository groups data access objects in order to create a single entity (domain object)
+    + source: https://stackoverflow.com/questions/8550124/what-is-the-difference-between-dao-and-repository-patterns?rq=1
+- Data transfer objects are only useful for when you have a significant mismatch between the model in your presentation layer and the underlying domain model. In this case, it makes sense to make presentation specific facade/gateway that maps from the domain model and presents an interface that's convenient for the presentation. It;s a pain in the ass to use, second to only ORMs
+    
