@@ -1,7 +1,7 @@
 # This, objects, and es6 classes
 
 ### Summary
-In this document, we will cover the `this` keyword, object prototypes, uses of `.call()` and `.apply()`, lexical `this`, arrow functions, es6 classes, object behavior delegation, some class theory, and objects-linking-other-objects. Our motivation is to learn these concepts is that we must know the finer points of object creation, assignment of values, and behavior delegation in order to better understand Javascript.
+In this document, we will cover the `this` keyword, object prototypes, uses of `.call()` and `.apply()`, lexical `this`, arrow functions, es6 classes, object behavior delegation, some class theory, and objects-linking-other-objects. In order for us to better understand Javascript, we must know the finer points of how object creation, assignment of values, and behavior delegation works in this language.
 
 ### This
 The `this` keyword is a special mechanism in Javascript - it allows us to implicitly pass reference values to other objects.
