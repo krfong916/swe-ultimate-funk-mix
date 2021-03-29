@@ -74,7 +74,7 @@ const person = Person.sayHi();
 person() // person is not a function
 ```
 Explanation: <br/>
-&nbsp;&nbsp;&nbsp;&nbsp; We are calling `person()` as a regular, plain function call. `first` is `undefined` because `this` refers to the global object. In order to observe the behavior we expect from `person()`, we must explicitly `this` to a specific object. <br/>
+We are calling `person()` as a regular, plain function call. `first` is `undefined` because `this` refers to the global object. In order to observe the behavior we expect from `person()`, we must explicitly `this` to a specific object. <br/>
 Observe:
 ```javascript
 const Person = {
@@ -91,7 +91,7 @@ To demonstrate: `setTimeout(Person.sayHi, 1000)`. In order to solve this problem
 ### Specify this using call(), apply()
 What's the use of `call()` and `apply()`? 
 `call()` and `apply()` are used to explicitly invoke a function a specified context.
-- as their first argument, they take a `this` keyword
+- their first argument is a `this` context
 ```javascript
 function ask(question) {
   console.log(this.teacher,question)
