@@ -116,7 +116,8 @@ In the example, we are invoking the `ask()` function with the context of `worksh
 `bind()` hard binds the object's `this` to a specific target object, permanently. Meaning, `bind()` produces a new function that is bound to a particular specific `this` context.
 For example:<br/>
 - when we try to pass a method as a callback to another function, we often lose the receiver of the method. In the case of setTimeout utility function defined by HTML, it explicitly calls your function in the context of the global object context.
-Suppose:<br/>
+Suppose:
+
 ```javascript
 const Person = {
   first: 'Kyle',
@@ -125,13 +126,36 @@ const Person = {
   }
 }
 setTimeout(Person.sayHi, 1000)
+//output: undefined
 ```
+
 setTimeout calls the callback `Person.sayHi` and sets the context to the global object (imagine the context of script 1000ms later). This will result in the intended `this` context to be lost.
-- Explicitly hard-binding the `this` value to the `Person` object, results in binding the `this` to a target object. `setTimeout(Person.sayHi.bind(Person), 1000)`
+- Explicitly hard-binding the `this` value to the `Person` object, results in binding the `this` to a target object. 
+
 ```javascript
-var greet = Person.sayHi.bind(Person);
-greet();
+const Person = {
+  first: 'Kyle',
+  sayHi: function() {
+    console.log(`${this.first}`)
+  }
+}
+let person = Person.sayHi.bind(Person);
+person();
+// output: Kyle
+
+// OR
+
+const Person = {
+  first: 'Kyle',
+  sayHi: function() {
+    console.log(`${this.first}`)
+  }
+}
+
+setTimeout(Person.sayHi.bind(Person), 1000)
+// output: Kyle
 ```
+
 Even if we used `call()` or `apply()`, the object's `this` reference to the target object is maintained from the hard-binding of `bind()`. <br/><br/>
 Notice that we use `bind()` for predictable `this` behavior, rather than flexible `this` behavior.
 
