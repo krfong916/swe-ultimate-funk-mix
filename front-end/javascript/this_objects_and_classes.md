@@ -15,12 +15,14 @@ In the global execution context, the `this` keyword refers to the global object.
 - In node.js, `this` refers to module.exports because the node engine runs each module inside a wrapper function and the wrapper function is invoked witth the `this` value set to module.exports
 
 ### This in function calls
-The `this` value is a binding amde when a function is invoked. What that value exactly is is determined by the call-site. In order to avoid polluting the global object with identifiers, use the `new` keyword to create an instance of a constructor. This will prevent properties being added to the global object
+When a function is invoked, the `this` value is binded to the function. The value of `this` is determined by the function's call-site.
 
 ### This in constructor calls - the `new` keyword
-The constructor call makes a copy of the prototype in the instance - SIKE! Javascript doesn't do any copying at all.
+One way to avoid polluting the global object with identifiers is to use the `new` keyword to create an instance of a constructor. This will prevent properties being added to the global object
+One may think the constructor call makes a *copy* of the prototype in the instance; that is not the case - Javascript doesn't do *any* copying.
 **A constructor call makes an object *linked to* its own prototype**
-The mental model should be linking, not copying.
+The mental model should be linking, not copying. Let me explain:
+
 An object with a `new` operator in front of it does the following
 1. create a brand new object
 2. links that object to another object
