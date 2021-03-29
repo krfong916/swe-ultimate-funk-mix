@@ -6,7 +6,7 @@ In this document, we will cover the `this` keyword, object prototypes, uses of `
 ### This
 The `this` keyword is a special mechanism in Javascript - it allows us to implicitly pass reference values to other objects.
 It is a source of frustration for many developer's, but it's not as complicated as they make it out to be. In this section, we'll cover the `this` keyword, how it functions, why it's useful, and how it can help us write more expressive code. <br>
-&nbsp;&nbsp;&nbsp;&nbsp; `this` **has nothing to do with *where* a function is declared, but everything to do with *how* a function is called.** When a function is invoked, an execution context (also activation record) is created. The execution context contains information about where the function is called from, this is known as the call-stack. To summarize, `this` is a binding that's made when a function is invoked. What it references is determined entirely by the call-site of where the function is called
+<br/>`this` **has nothing to do with *where* a function is declared, but everything to do with *how* a function is called.** When a function is invoked, an execution context (also activation record) is created. The execution context contains information about where the function is called from, this is known as the call-stack. To summarize, `this` is a binding that's made when a function is invoked. What it references is determined entirely by the call-site of where the function is called
 
 ### TL;DR
 ### This is in the global context
@@ -108,9 +108,9 @@ var workshop2 = {
 ask.call(workshop1, "Can I explicitly set context?")
 ask.call(workshop2, "Can I explicitly set context?")
 ```
-In the example, we are invoking the `ask()` function with the context of `workshop1`. We say "wherever this function comes from, invoke it in a particular context which I'm going to specify"
-- `apply()`: allows us to invoke a function with arguments
-- `call()`: is for an array, it requires parameters to be lsited explicitly
+In the example, we are invoking the `ask()` function with the context of `workshop1`. We say "wherever `ask()` comes from, invoke `ask()` with this particular context"
+- `apply()`: invokes a function using an array as its arguments
+- `call()`: invokes a function with arguments, arguments must be explicitly defined
 
 ### Hard-binding a function's this value using bind()
 `bind()` hard binds the object's `this` to a specific target object, permanently. Meaning, `bind()` produces a new function that is bound to a particular specific `this` context.
