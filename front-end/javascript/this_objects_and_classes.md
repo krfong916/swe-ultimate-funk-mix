@@ -32,12 +32,19 @@ An object with a `new` operator in front of it does the following
 For example:
 
 ```javascript
-function person(firstName, lastName) {
+function Person(firstName, lastName) {
   this.firstName = firstName;
   this.lastName = lastName;
   // implicitly return this;
 }
 var somePerson = new Person('zendaya', 'cozz');
+console.log(somePerson);
+/* Output:
+{
+  firstName: "zendaya",
+  lastName: "cozz"
+}
+*/
 ```
 
 Note: `this` is implicitly returned in a constructor
