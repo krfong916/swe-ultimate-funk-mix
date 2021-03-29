@@ -185,45 +185,51 @@ functionReference(); // bind returns a function, we can invoke that function
 A heuristic for using `this` aware code is if our method calls depend on the dynamicism of `this`, and every once in a while, we are using `bind()`. However, if we find ourselves using `bind()` often, we are losing the dynamicism of `this` and would be better served using lexical closure (predictability).
 
 ### Arrow functions
-The arrow function does not have a `this` so it resolves is lexically.
-- An arrow function does not define a `this` keyword at all. If we put a `this` keyword inside an arrow function, it will behave like any other function - which mean it will lexically resolve to some enclosing scope that does define the `this` keyword.
-- Arrow functions do not have a prototype, that's why it fails when `new` is called on it. It doesn't have a prototype so it can't be 'constructed'.
-- Arrow functions use the `this` from its enclosing execution context
-- If we try to pass a `this` arg to a function using `call()`, `apply()`, or `bind()`, it will be ignored i.e. the arrow function's thisArg always uses the `this` value captured when the function was created
-- Arrow functions can't be used as constructors
-- the benefit of using an arrow function is seen when we want to access `this` within a callback
+
+#### TL;DR The arrow function does not have a `this` so it resolves is lexically.
+
+- An arrow function doesn't define `this` keyword at all. Instead, `this` will lexically resolve to the enclosing scope. If we put a `this` keyword inside an arrow function, it will behave like any other function - `this` will use the enclosing scope as the execution context.
+- Arrow functions do not have a prototype, that's why they fails when `new` is called on it. It doesn't have a prototype so it can't be 'constructed'.
+- If we try to pass a `this` arg to a function using `call()`, `apply()`, or `bind()`, the context will be ignored because the arrow function's `thisArg` always uses the `this` value captured *when the function was created*
+- The benefit of using an arrow function is seen when we want to access `this` within a callback
 
 Consider the following example:
+
 ```javascript
-const workshop = {
-  teacher: 'Kyle',
+const exercise = {
+  student: 'Kyle',
   ask(question) {
     setInterval(() => {
-      console.log(this.teacher, question)
+      console.log(this.student, question)
     }, 1000);
   }
 }
-workshop.ask("Is this lexical 'this'?");
+
+student.ask("IS the lexical 'this`");
 // Kyle, Is this lexical 'this?'
 ```
-How are we able to use the value of `this.teacher` in the arrow function? <br/> Explanation: <br/>
-There does not exist a `this` binding in an arrow function. Instead, we treat the arrow function like a regular function and use lexical scope to resolve the `this` keyword's value. <br/>
-Using lexical scope, we go from the callback function scope to the enclosing scope, one level up, which is the `ask()` function to determine the value of `this`. `ask()`'s definition of the `this` keyword is set by the call-site. <br/>
-When the callback in `ask()` is later invoked, it has closed over the parent scope that had a `this` keyword pointing at the `workshop` object 
+
+Explanation: <br/>
+Again, a `this` binding doesn't exist in an arrow function. Instead, we treat the arrow function like any regular function - we use the lexical scope to resolve the `this` keyword's value. <br/>
+To process of determining the lexical scope is as follows:
+- We start at the callback function scope and work towards the enclosing scope, one level up/out, which is the `ask()` function to determine the value of `this`. 
+- The `this` keyword's value of `ask()` is defined on the call-site.
+- Here, the call-site is the `exercise` object. When the callback in `ask()` is invoked, `this` has closed over the parent scope. The `this` value points to the `exercise` object 
 
 ```javascript
-var workshop = {
-  teacher: "Kyle",
+let exercise = {
+  student: "Kyle",
   ask: (question) => {
-    console.log(this.teacher,question)
+    console.log(this.student, question)
   }
 }
-workshop.ask("What happened to 'this'?");
+exercise.ask("What happened to 'this'?");
 // undefined "What happened to 'this'?"
 workshop.ask.call(workshop, "Still no 'this'?");
 // undefined "Still no 'this'?"
 ```
-Arrow functions do not have a `this`, so we resolve `this` lexically. `workshop` object is not a scope.
+
+Arrow functions do not have a `this`, so we resolve `this` lexically. The `exercise` object is not a scope.
 There are only two scopes in this script - the scope of the `ask()` function, which is an arrow function, and the global scope.
 A common source of confusion is to thinking that the curly braces create scope but they don't.
 
