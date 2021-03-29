@@ -26,10 +26,11 @@ The mental model should be linking, not copying. Let me explain:
 An object with a `new` operator in front of it does the following
 1. create a brand new object
 2. links that object to another object
-3. calls function its `this` keyword pointed at the newly created object
-4. if function does not return an object, assume return of `this`
+3. calls the function with its `this` reference pointed at the newly created object
+4. if the function does not return an object, assume return of `this`
 <br/>
 For example:
+
 ```javascript
 function person(firstName, lastName) {
   this.firstName = firstName;
@@ -38,6 +39,7 @@ function person(firstName, lastName) {
 }
 var somePerson = new Person('zendaya', 'cozz');
 ```
+
 Note: `this` is implicitly returned in a constructor
 
 ### This in method calls
