@@ -1,12 +1,12 @@
 # This, objects, and es6 classes
 
 ### Summary
-In this document, we will cover the `this` keyword, object prototypes, uses of `.call()` and `.apply()`, lexical `this`, arrow functions, es6 classes, object behavior delegation, some class theory, and objects-linking-other-objects. In order for us to better understand Javascript, we must know the finer points of how object creation, assignment of values, and behavior delegation works in this language.
+In this document, we will cover the `this` keyword, object prototypes, uses of `.call()` and `.apply()`, lexical `this`, arrow functions, es6 classes, object behavior delegation, some class theory, and objects-linking-other-objects pattern as provided by Javascript Expert Kyle Simpson. In order for us to better understand Javascript, we must know the finer points of how object creation, assignment of values, and behavior delegation works in this language.
 
 ### This
 The `this` keyword is a special mechanism in Javascript - it allows us to implicitly pass reference values to other objects.
 It is a source of frustration for many developer's, but it's not as complicated as they make it out to be. In this section, we'll cover the `this` keyword, how it functions, why it's useful, and how it can help us write more expressive code. <br>
-&nbsp;&nbsp;&nbsp;&nbsp; `this` has nothing to do with *where* a function is declared, but everything to do with *how* a function is called. When a function is invoked, an activation record (aka execution context) is created. The activation record contains information about where the function is called from, this is known as the call-stack. To summarize, `this` is a binding that's made when a function is invoked. What it references is determined entirely by the call-site where the function is called
+&nbsp;&nbsp;&nbsp;&nbsp; `this` **has nothing to do with *where* a function is declared, but everything to do with *how* a function is called.** When a function is invoked, an execution context (also activation record) is created. The execution context contains information about where the function is called from, this is known as the call-stack. To summarize, `this` is a binding that's made when a function is invoked. What it references is determined entirely by the call-site of where the function is called
 
 ### TL;DR
 ### This is in the global context
