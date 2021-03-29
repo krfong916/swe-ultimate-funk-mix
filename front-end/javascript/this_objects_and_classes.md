@@ -55,7 +55,7 @@ For instance:
 ```javascript
 const Person = {
   firstName: 'Kyle',
-  sayHi() {
+  sayHi: function() {
     console.log(`Hi, my name is ${this.firstName}`)
   }
 }
@@ -70,11 +70,11 @@ const Person = {
   }
 }
 
-const greet = Person.sayHi();
-greet() // greet is not a function
+const person = Person.sayHi();
+person() // person is not a function
 ```
 Explanation: <br/>
-&nbsp;&nbsp;&nbsp;&nbsp; We are calling `greet()` as a regular, plain function call. `first` is `undefined` because `this` refers to the global object. In order to observe the behavior we expect from `greet()`, we must explicitly `this` to a specific object. <br/>
+&nbsp;&nbsp;&nbsp;&nbsp; We are calling `person()` as a regular, plain function call. `first` is `undefined` because `this` refers to the global object. In order to observe the behavior we expect from `person()`, we must explicitly `this` to a specific object. <br/>
 Observe:
 ```javascript
 const Person = {
